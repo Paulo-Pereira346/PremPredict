@@ -1,2 +1,2 @@
 # premier-league-prediction-model
-Data Science model for predicting Premier League winner and other predictions. Data obtained via API Extraction from Web
+Data Science model for predicting no of goals scored by both teams in a match.
