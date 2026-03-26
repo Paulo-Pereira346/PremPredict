@@ -67,5 +67,5 @@ df_full[cols] = df_full[cols].fillna(df_full[cols].mean())
 # print(df_full.head(11))
 print(df_full.isna().sum().sum())
 
-df_full.to_csv(root / "data" / "processed" / "Final_dataset.csv")
+df_full.to_csv(root / "data" / "processed" / "Final_dataset.csv",index=False)
 
