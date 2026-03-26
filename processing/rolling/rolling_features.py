@@ -1,6 +1,9 @@
 import pandas as pd
+from pathlib import Path
 
-df = pd.read_csv("../data/processed/epl_pre_rolling.csv")
+file_path = Path(__file__).resolve()
+root = file_path.parents[2]
+df = pd.read_csv(root / "data" / "processed" / "epl_pre_rolling.csv")
 
 # print(df.head())
 # print(df["team"].is_monotonic_increasing)
@@ -22,8 +25,16 @@ for att in cumulative_attributes:
     col = f"cum_{att}"
     df[col] = df.groupby("team")[att].transform(lambda x: x.shift(1).expanding().mean())
 
-print(df[df["team"]=="Arsenal"][["date","gf","cum_gf"]])
-# print(df.head())
+
+#Preliminary Checks before Saving data
+# print(df[df["team"]=="Arsenal"][["date","gf","gf_last_5","gf_last_10","cum_gf"]].head(11))
+print(df.head())
+print(df.shape)
+print(df.columns)
+df = df.sort_values(["team", "date"]).reset_index(drop=True)
+print(df.groupby("team")["date"].is_monotonic_increasing.all())
+
+df.to_csv(root / "data" / "processed" / "epl_rolling.csv" ,index = False)
 
 
 

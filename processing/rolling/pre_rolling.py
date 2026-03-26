@@ -1,8 +1,11 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
 def pre_rolling_dataset():
-    df = pd.read_csv("../data/processed/epl_with_elo.csv")
+    file_path = Path(__file__).resolve()
+    root = file_path.parents[2]
+    df = pd.read_csv(root / "data" / "processed" / "epl_with_elo.csv")
 
     df_home = df[["date","home","hg","ag","home_shots","home_sot"]]
     df_home["venue"] = "home"
@@ -57,7 +60,7 @@ def pre_rolling_dataset():
         print("There is no issue with Point Calculation")
         
 
-    df_prem.to_csv("../data/processed/epl_pre_rolling.csv" ,index = False)
+    df_prem.to_csv(root / "data" / "processed" / "epl_pre_rolling.csv" ,index = False)
 
 
 pre_rolling_dataset()   
