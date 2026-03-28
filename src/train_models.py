@@ -43,8 +43,8 @@ for fold, (train_index,test_index) in enumerate(tscv.split(X)):
     model_home_pois = PoissonRegressor(max_iter=200)   #Using parameters for poisson since Poisson baseline prediction was better
     model_away_pois = PoissonRegressor(max_iter=200)
      
-    model_home_gb = GradientBoostingRegressor(random_state=42)
-    model_away_gb = GradientBoostingRegressor(random_state=42)
+    model_home_gb = GradientBoostingRegressor(n_estimators=300,max_depth=4,learning_rate=0.04,subsample=0.8,min_samples_leaf=8,random_state=42)
+    model_away_gb = GradientBoostingRegressor(n_estimators=300,max_depth=4,learning_rate=0.04,subsample=0.8,min_samples_leaf=8,random_state=42)
    
    #Fitting Models 
     model_home_pois.fit(X_train,Y_home_train)
@@ -84,8 +84,4 @@ print("(Poisson)Average of MAE for Home is:", MAE_home_avg_Pois)
 print("(Poisson)Average of MAE for Away is:", MAE_away_avg_Pois)
 
 print("(Gradient Boosting)Average of MAE for Home is:", MAE_home_avg_GB)
-print("(Gradient Boosting)Average of MAE for Away is:", MAE_away_avg_GB)
-
-
- 
-    
+print("(Gradient Boosting)Average of MAE for Away is:", MAE_away_avg_GB)    
