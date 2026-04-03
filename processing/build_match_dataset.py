@@ -48,12 +48,12 @@ df_full["cum_att_edge"] = df_full["H_cum_gf"] - df_full["A_cum_ga"]
 df_full["sot_edge_5"] = df_full["H_sot_last_5"] - df_full["A_sot_last_5"]
 df_full["sot_edge_10"] = df_full["H_sot_last_10"] - df_full["A_sot_last_10"]
 
-# df_full["def_matchup_5"] = df_full["H_ga_last_5_home"] + df_full["A_ga_last_5_away"]
-# df_full["att_matchup_5"] = df_full["H_gf_last_5_home"] + df_full["A_gf_last_5_away"]
+df_full["def_matchup_5"] = df_full["H_ga_last_5_home"] + df_full["A_ga_last_5_away"]
+df_full["att_matchup_5"] = df_full["H_gf_last_5_home"] + df_full["A_gf_last_5_away"]
 
 df_full["elo_diff_abs"] = abs(df_full["elo_diff"])
 df_full["form_diff_5_abs"] = abs(df_full["form_diff_5"])
-# df_full["match_balance"] = df_full["elo_diff_abs"] + df_full["form_diff_5_abs"] + abs(df_full["att_edge_5"])
+df_full["match_balance"] = df_full["elo_diff_abs"] + df_full["form_diff_5_abs"] + abs(df_full["att_edge_5"])
 # df_full["form_diff_10_abs"] = abs(df_full["form_diff_10"])
 
 df_full["H_draw_last_5"] = df_full["H_points_last_5_home"] - 3*df_full["H_win_last_5_home"]
