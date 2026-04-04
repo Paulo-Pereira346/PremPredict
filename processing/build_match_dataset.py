@@ -79,13 +79,14 @@ for col in l:
     cols.remove(col)
 # print(cols)
 
+# print(df_full.isna().sum()[df_full.isna().sum() > 0])
 df_full[cols] = df_full[cols].fillna(df_full[cols].mean())
 # print(df_full.head(11))
 # print(df_full.isna().sum().sum())
-print(df_full.isna().sum()[df_full.isna().sum() > 0])
-print(df_full.head())
-print(df_full["H_draw_last_5"].describe())
-print(df_full["A_draw_last_5"].describe())
+# print(df_full.isna().sum()[df_full.isna().sum() > 0])
+# print(df_full.head())
+# print(df_full["H_draw_last_5"].describe())
+# print(df_full["A_draw_last_5"].describe())
 
 df_full.to_csv(root / "data" / "processed" / "Final_dataset.csv",index=False)
 
