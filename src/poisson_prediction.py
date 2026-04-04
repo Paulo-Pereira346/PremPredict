@@ -53,6 +53,7 @@ Y_home = df["hg"]
 Y_away = df["ag"]
 Y_res = df["FTR"]
 
+print(X.columns)
 #Time-Series Split
 tscv = TimeSeriesSplit(n_splits = 5)
 
