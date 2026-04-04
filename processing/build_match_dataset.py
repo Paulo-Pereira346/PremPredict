@@ -8,20 +8,20 @@ df_epl = pd.read_csv(root / "data" / "processed" / "epl_with_elo.csv")
 df_roll = pd.read_csv(root / "data" / "processed" / "epl_rolling.csv")
 df_roll = df_roll.sort_values("date").reset_index(drop=True)
 
-# # Check 1 — venue split columns only have values for the right venue
-# arsenal_home = df_roll[(df_roll["team"] == "Arsenal") & (df_roll["venue"] == "home")]
-# arsenal_away = df_roll[(df_roll["team"] == "Arsenal") & (df_roll["venue"] == "away")]
+# Check 1 — venue split columns only have values for the right venue
+arsenal_home = df_roll[(df_roll["team"] == "Arsenal") & (df_roll["venue"] == "home")]
+arsenal_away = df_roll[(df_roll["team"] == "Arsenal") & (df_roll["venue"] == "away")]
 
-# print("Home rows - gf_last_5_home NaNs:", arsenal_home["gf_last_5_home"].isna().sum())
-# print("Home rows - gf_last_5_away NaNs:", arsenal_home["gf_last_5_away"].isna().sum())
-# print("Away rows - gf_last_5_away NaNs:", arsenal_away["gf_last_5_away"].isna().sum())
-# print("Away rows - gf_last_5_home NaNs:", arsenal_away["gf_last_5_home"].isna().sum())
+print("Home rows - gf_last_5_home NaNs:", arsenal_home["gf_last_5_home"].isna().sum())
+print("Home rows - gf_last_5_away NaNs:", arsenal_home["gf_last_5_away"].isna().sum())
+print("Away rows - gf_last_5_away NaNs:", arsenal_away["gf_last_5_away"].isna().sum())
+print("Away rows - gf_last_5_home NaNs:", arsenal_away["gf_last_5_home"].isna().sum())
 
-# # Check 2 — rolling window is actually shifting (no data leakage)
-# print(arsenal_home[["date", "gf", "gf_last_5_home"]].head(10))
-# # gf_last_5_home on row 1 should use row 0's gf, not row 1's
+# Check 2 — rolling window is actually shifting (no data leakage)
+print(arsenal_home[["date", "gf", "gf_last_5_home"]].head(10))
+# gf_last_5_home on row 1 should use row 0's gf, not row 1's
 
-# # Check 3 — date ordering is correct per team
+# Check 3 — date ordering is correct per team
 # print(df_roll.groupby("team")["date"].is_monotonic_increasing.all())
 
 
@@ -99,23 +99,23 @@ for col in l:
 # print(df_full.isna().sum()[df_full.isna().sum() > 0])
 df_full[cols] = df_full[cols].fillna(df_full[cols].mean())
 
-# # Check 4 — no NaNs remaining after fillna
-# print("Total NaNs:", df_full.isna().sum().sum())
+# Check 4 — no NaNs remaining after fillna
+print("Total NaNs:", df_full.isna().sum().sum())
 
-# # Check 5 — draw calculation makes sense
-# # H_draw_last_5 should be between 0 and 1 always
-# print("H_draw_last_5 min:", df_full["H_draw_last_5"].min())
-# print("H_draw_last_5 max:", df_full["H_draw_last_5"].max())
+# Check 5 — draw calculation makes sense
+# H_draw_last_5 should be between 0 and 1 always
+print("H_draw_last_5 min:", df_full["H_draw_last_5"].min())
+print("H_draw_last_5 max:", df_full["H_draw_last_5"].max())
 
-# # Check 6 — row count is correct
-# print("Total rows:", len(df_full))
+# Check 6 — row count is correct
+print("Total rows:", len(df_full))
 
-# # Check 7 — FTR distribution
-# print(df_full["FTR"].value_counts(normalize=True))
+# Check 7 — FTR distribution
+print(df_full["FTR"].value_counts(normalize=True))
 
-# # Check 8 — spot check a specific match
-# arsenal_home_matches = df_full[df_full["home"] == "Arsenal"].head(5)
-# print(arsenal_home_matches[["date", "home", "away", "H_gf_last_5_home", "A_gf_last_5_away"]])
+# Check 8 — spot check a specific match
+arsenal_home_matches = df_full[df_full["home"] == "Arsenal"].head(5)
+print(arsenal_home_matches[["date", "home", "away", "H_gf_last_5_home", "A_gf_last_5_away"]])
 
 
 # print(df_full.head(40))
