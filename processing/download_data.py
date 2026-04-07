@@ -1,4 +1,6 @@
 import pandas as pd 
+from pathlib import Path
+
 def download_epl_seasons(start_year,end_year):
     frames = []
     for year in range(start_year,end_year):
@@ -77,10 +79,11 @@ def download_epl_seasons(start_year,end_year):
     print(df_prem.tail())
     
     # print(df_prem.info())
+    #Store data in file
+    file_path = Path(__file__).resolve()
+    root = file_path.parents[1]
+    df_prem.to_csv(root / "data" / "raw" / "epl_matches.csv",index=False)
     
-    df_prem.to_csv("../data/raw/epl_matches.csv",index=False)
-    
-        
- 
+     
                    
 download_epl_seasons(2010,2024)
