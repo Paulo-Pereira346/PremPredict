@@ -31,18 +31,24 @@ def predict_outcome(lambda_home, lambda_away, max_goals=10):
                 draw_prob += p
             else:
                 away_win_prob += p
+    
+    #Normalization
+    total = home_win_prob + draw_prob + away_win_prob
+    if total > 0:
+        home_win_prob /= total
+        draw_prob /= total
+        away_win_prob /= total
 
     probs = {"H": home_win_prob, "D": draw_prob, "A": away_win_prob}
-    return max(probs, key=probs.get)
+    return max(probs, key=probs.get),home_win_prob, draw_prob, away_win_prob
 
 
 
 def predict_match(input_data: dict):
     try:
-        # Convert to DataFrame
         df = pd.DataFrame([input_data])
 
-        # Enforce column order (CRITICAL)
+        # Enforce column order 
         df = df[feature_cols]
 
     except KeyError as e:
@@ -54,13 +60,20 @@ def predict_match(input_data: dict):
     lambda_home = model_home.predict(df)[0]
     lambda_away = model_away.predict(df)[0]
 
-    outcome = predict_outcome(lambda_home, lambda_away)
+    outcome,home_prob, draw_prob, away_prob = predict_outcome(lambda_home, lambda_away)
 
     return {
-        "lambda_home": float(lambda_home),
-        "lambda_away": float(lambda_away),
+        "lambda_home": round(float(lambda_home),3),
+        "lambda_away": round(float(lambda_away),3),
         "prediction": outcome,
-        "score": f"{round(lambda_home)}-{round(lambda_away)}"
+        
+        "predicted_score": f"{round(lambda_home)}-{round(lambda_away)}",
+        
+        "probabilities": {
+            "home_win":round(home_prob,3),
+            "draw":round(draw_prob,3),
+            "away_win":round(away_prob,3)
+        }
     }
 
 
