@@ -4,7 +4,7 @@ from pathlib import Path
 
 def pre_rolling_dataset():
     file_path = Path(__file__).resolve()
-    root = file_path.parents[2]
+    root = file_path.parents[1]
     df = pd.read_csv(root / "data" / "processed" / "epl_with_elo.csv")
 
     df_home = df[["date","home","hg","ag","home_shots","home_sot"]]
@@ -63,5 +63,6 @@ def pre_rolling_dataset():
     df_prem.to_csv(root / "data" / "processed" / "epl_pre_rolling.csv" ,index = False)
 
 
-pre_rolling_dataset()   
+if __name__ == "__main__":
+    pre_rolling_dataset() 
 
