@@ -61,7 +61,10 @@ def compute_elo():
         {"team": team, "current_elo": elo} 
         for team, elo in elo_ratings.items()
     ])
+    
+    (root / "data" / "api_data").mkdir(exist_ok=True)
     elo_df.to_csv(root / "data" / "api_data" / "current_elo.csv", index=False)
     print("Current Elo ratings saved")
 
-compute_elo()
+if __name__ == "__main__":
+    compute_elo()

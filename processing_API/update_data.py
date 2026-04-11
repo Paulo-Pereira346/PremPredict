@@ -136,4 +136,5 @@ def update_epl_data():
     
     return True
 
-update_epl_data()
+if __name__ == "__main__":
+    update_epl_data()
