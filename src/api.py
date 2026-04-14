@@ -1,10 +1,18 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import joblib
 from pathlib import Path
 from scipy.stats import poisson
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #Load Models
 file_path = Path(__file__).resolve()
@@ -152,3 +160,8 @@ def predict(home: str, away: str, date: str):
     input = feature_eng(home, away, date)  
     return predict_match(input)
     
+@app.get("/teams")
+def get_teams():
+    df = pd.read_csv(root / "data" / "processed" / "epl_pre_rolling.csv")
+    teams = sorted(df["team"].unique().tolist())
+    return {"teams": teams}

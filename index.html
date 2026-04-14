@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PremPredict</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --green: #00ff87;
+    --green-dim: #00ff8722;
+    --green-mid: #00ff8744;
+    --text: #f0f0f0;
+    --muted: #666666;
+    --red: #ff4444;
+    --yellow: #ffd60a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background pitch lines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,255,135,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,135,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 3px;
+    color: var(--text);
+  }
+
+  .logo span {
+    color: var(--green);
+  }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 4px 10px;
+    text-transform: uppercase;
+  }
+
+  /* Main form area */
+  .predict-section {
+    padding: 48px 0;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .matchup {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .vs-divider {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .team-select-wrap {
+    position: relative;
+  }
+
+  .team-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .team-select-wrap select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 14px 16px;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .team-select-wrap select:focus,
+  .team-select-wrap select:hover {
+    border-color: var(--green);
+  }
+
+  .team-select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 14px;
+    bottom: 15px;
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 0.8rem;
+  }
+
+  .date-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    margin-bottom: 32px;
+  }
+
+  .date-wrap {
+    flex: 1;
+  }
+
+  .date-wrap label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .date-wrap input[type="date"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    color-scheme: dark;
+  }
+
+  .date-wrap input[type="date"]:focus,
+  .date-wrap input[type="date"]:hover {
+    border-color: var(--green);
+  }
+
+  .predict-btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+    padding: 14px 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .predict-btn:hover {
+    background: #00cc6a;
+    transform: translateY(-1px);
+  }
+
+  .predict-btn:active {
+    transform: translateY(0);
+  }
+
+  .predict-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .loading.active { display: block; }
+
+  .loading-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    color: var(--green);
+    text-transform: uppercase;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Results */
+  .results {
+    display: none;
+    animation: fadeUp 0.4s ease forwards;
+  }
+
+  .results.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 32px;
+    margin-bottom: 2px;
+  }
+
+  .fixture-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .fixture-title .home { color: var(--text); }
+  .fixture-title .sep { color: var(--muted); margin: 0 12px; }
+  .fixture-title .away { color: var(--text); }
+
+  .fixture-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+  }
+
+  .result-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .result-card-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .result-card-value.home-win { color: var(--green); }
+  .result-card-value.draw { color: var(--yellow); }
+  .result-card-value.away-win { color: var(--red); }
+
+  .result-card-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Probability bars */
+  .probs-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-bottom: 2px;
+  }
+
+  .probs-card .result-card-label {
+    margin-bottom: 24px;
+  }
+
+  .prob-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 60px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .prob-row:last-child { margin-bottom: 0; }
+
+  .prob-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .prob-bar-track {
+    height: 6px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .prob-bar-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .prob-bar-fill.home { background: var(--green); }
+  .prob-bar-fill.draw { background: var(--yellow); }
+  .prob-bar-fill.away { background: var(--red); }
+
+  .prob-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .prob-pct.home { color: var(--green); }
+  .prob-pct.draw { color: var(--yellow); }
+  .prob-pct.away { color: var(--red); }
+
+  /* Lambda card */
+  .lambda-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-bottom: 2px;
+  }
+
+  .lambda-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .lambda-team {
+    text-align: center;
+  }
+
+  .lambda-team-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .lambda-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .lambda-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .lambda-sep {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: var(--border);
+  }
+
+  /* Error */
+  .error-msg {
+    display: none;
+    background: #ff444411;
+    border: 1px solid #ff444444;
+    color: var(--red);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+
+  .error-msg.active { display: block; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    margin-top: 48px;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .footer-text span { color: var(--green); }
+
+  @media (max-width: 600px) {
+    .matchup { grid-template-columns: 1fr; }
+    .vs-divider { display: none; }
+    .result-grid { grid-template-columns: 1fr; }
+    .fixture-title { font-size: 1.8rem; }
+    .date-row { flex-direction: column; }
+    .predict-btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-inner">
+      <div class="logo">Prem<span>Predict</span></div>
+      <div class="badge">ML Powered</div>
+    </div>
+  </header>
+
+  <section class="predict-section">
+    <div class="section-label">// Select Fixture</div>
+
+    <div class="matchup">
+      <div class="team-select-wrap">
+        <div class="team-label">Home Team</div>
+        <select id="home-team">
+          <option value="">Select team...</option>
+        </select>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="team-select-wrap">
+        <div class="team-label">Away Team</div>
+        <select id="away-team">
+          <option value="">Select team...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="date-row">
+      <div class="date-wrap">
+        <label for="match-date">Match Date</label>
+        <input type="date" id="match-date" />
+      </div>
+      <button class="predict-btn" id="predict-btn" onclick="predict()">
+        Predict
+      </button>
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+  </section>
+
+  <div class="loading" id="loading">
+    <div class="loading-text">/// Analysing fixture data...</div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-header">
+      <div class="fixture-title">
+        <span class="home" id="res-home"></span>
+        <span class="sep">—</span>
+        <span class="away" id="res-away"></span>
+      </div>
+      <div class="fixture-meta" id="res-date"></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card" style="grid-column: 1 / -1;">
+        <div class="result-card-label">// Predicted Outcome</div>
+        <div class="result-card-value" id="res-outcome"></div>
+        <div class="result-card-sub" id="res-outcome-label"></div>
+      </div>
+    </div>
+
+    <div class="probs-card">
+      <div class="result-card-label">// Win Probabilities</div>
+      <div class="prob-row">
+        <div class="prob-label" id="prob-home-label">Home</div>
+        <div class="prob-bar-track">
+          <div class="prob-bar-fill home" id="bar-home"></div>
+        </div>
+        <div class="prob-pct home" id="pct-home"></div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-label">Draw</div>
+        <div class="prob-bar-track">
+          <div class="prob-bar-fill draw" id="bar-draw"></div>
+        </div>
+        <div class="prob-pct draw" id="pct-draw"></div>
+      </div>
+      <div class="prob-row">
+        <div class="prob-label" id="prob-away-label">Away</div>
+        <div class="prob-bar-track">
+          <div class="prob-bar-fill away" id="bar-away"></div>
+        </div>
+        <div class="prob-pct away" id="pct-away"></div>
+      </div>
+    </div>
+
+    <div class="lambda-card">
+      <div class="result-card-label">// Expected Goals (λ)</div>
+      <div class="lambda-row">
+        <div class="lambda-team">
+          <div class="lambda-team-name" id="lambda-home-name"></div>
+          <div class="lambda-value" id="lambda-home-val"></div>
+          <div class="lambda-sub">xG Home</div>
+        </div>
+        <div class="lambda-sep">—</div>
+        <div class="lambda-team">
+          <div class="lambda-team-name" id="lambda-away-name"></div>
+          <div class="lambda-value" id="lambda-away-val"></div>
+          <div class="lambda-sub">xG Away</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-text">PremPredict — <span>ML Match Prediction</span></div>
+      <div class="footer-text">Poisson Regression Model · EPL 2010–2025</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:8000';
+
+  const homeSelect = document.getElementById('home-team');
+  const awaySelect = document.getElementById('away-team');
+
+  async function loadTeams() {
+    try {
+      const res = await fetch(`${API_BASE}/teams`);
+      const data = await res.json();
+      data.teams.forEach(team => {
+        homeSelect.innerHTML += `<option value="${team}">${team}</option>`;
+        awaySelect.innerHTML += `<option value="${team}">${team}</option>`;
+      });
+    } catch {
+      console.error('Could not load teams from API');
+    }
+  }
+
+  loadTeams();
+
+  // Set today's date as default
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('match-date').value = today;
+
+  async function predict() {
+    const home = document.getElementById('home-team').value;
+    const away = document.getElementById('away-team').value;
+    const date = document.getElementById('match-date').value;
+
+    const errorEl = document.getElementById('error-msg');
+    errorEl.classList.remove('active');
+
+    if (!home || !away || !date) {
+      errorEl.textContent = '// ERROR: Please select both teams and a date';
+      errorEl.classList.add('active');
+      return;
+    }
+
+    if (home === away) {
+      errorEl.textContent = '// ERROR: Home and away teams cannot be the same';
+      errorEl.classList.add('active');
+      return;
+    }
+
+    // Show loading
+    document.getElementById('results').classList.remove('active');
+    document.getElementById('loading').classList.add('active');
+    document.getElementById('predict-btn').disabled = true;
+
+    try {
+      const res = await fetch(`${API_BASE}/predict?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}&date=${date}`);
+      
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      
+      const data = await res.json();
+      displayResults(home, away, date, data);
+
+    } catch (err) {
+      document.getElementById('loading').classList.remove('active');
+      errorEl.textContent = `// ERROR: Could not connect to API. Make sure the server is running on port 8000`;
+      errorEl.classList.add('active');
+    } finally {
+      document.getElementById('predict-btn').disabled = false;
+    }
+  }
+
+  function displayResults(home, away, date, data) {
+    document.getElementById('loading').classList.remove('active');
+
+    // Header
+    document.getElementById('res-home').textContent = home.toUpperCase();
+    document.getElementById('res-away').textContent = away.toUpperCase();
+    document.getElementById('res-date').textContent = `// ${new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+
+    // Outcome
+    const outcomeEl = document.getElementById('res-outcome');
+    const outcomeLabelEl = document.getElementById('res-outcome-label');
+    const pred = data.prediction;
+
+    if (pred === 'H') {
+      outcomeEl.textContent = 'HOME WIN';
+      outcomeEl.className = 'result-card-value home-win';
+      outcomeLabelEl.textContent = `${home} predicted to win`;
+    } else if (pred === 'A') {
+      outcomeEl.textContent = 'AWAY WIN';
+      outcomeEl.className = 'result-card-value away-win';
+      outcomeLabelEl.textContent = `${away} predicted to win`;
+    } else {
+      outcomeEl.textContent = 'DRAW';
+      outcomeEl.className = 'result-card-value draw';
+      outcomeLabelEl.textContent = 'Match predicted to end level';
+    }
+
+    // Score removed
+
+    // Probabilities
+    const homeProb = data.probabilities.home_win;
+    const drawProb = data.probabilities.draw;
+    const awayProb = data.probabilities.away_win;
+
+    document.getElementById('prob-home-label').textContent = home;
+    document.getElementById('prob-away-label').textContent = away;
+
+    document.getElementById('pct-home').textContent = `${(homeProb * 100).toFixed(1)}%`;
+    document.getElementById('pct-draw').textContent = `${(drawProb * 100).toFixed(1)}%`;
+    document.getElementById('pct-away').textContent = `${(awayProb * 100).toFixed(1)}%`;
+
+    // Animate bars after a tick
+    setTimeout(() => {
+      document.getElementById('bar-home').style.width = `${homeProb * 100}%`;
+      document.getElementById('bar-draw').style.width = `${drawProb * 100}%`;
+      document.getElementById('bar-away').style.width = `${awayProb * 100}%`;
+    }, 100);
+
+    // Lambdas
+    document.getElementById('lambda-home-name').textContent = home.toUpperCase();
+    document.getElementById('lambda-away-name').textContent = away.toUpperCase();
+    document.getElementById('lambda-home-val').textContent = data.lambda_home;
+    document.getElementById('lambda-away-val').textContent = data.lambda_away;
+
+    document.getElementById('results').classList.add('active');
+  }
+
+  // Allow Enter key to trigger prediction
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') predict();
+  });
+</script>
+
+</body>
+</html>
