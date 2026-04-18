@@ -1,137 +1,190 @@
-# ⚽ Football Match Prediction System
-
-## 📌 Overview
-
-This project is an end-to-end football match prediction system that estimates the probability of match outcomes (Home Win, Draw, Away Win) using statistical modeling and feature engineering.
-
-Unlike basic machine learning projects, this system combines domain-specific modeling (Poisson distribution), dynamic team strength (ELO ratings), and real-time feature updates through an automated pipeline.
-
+# PremPredict — EPL Match Prediction Model
+ 
+A machine learning system that predicts English Premier League match outcomes using Poisson Regression. Given any two EPL teams, it returns win probabilities for all three outcomes (Home Win / Draw / Away Win) along with expected goals for each team.
+ 
+Built with a full data pipeline, REST API, and web frontend.
+ 
 ---
-
-## 🚀 Key Features
-
-### 🔢 Probabilistic Predictions
-
-* Outputs probabilities for:
-
-  * Home Win
-  * Draw
-  * Away Win
-* Based on Poisson-distributed goal modeling
-
-### ⚙️ Poisson Goal Modeling
-
-* Models goals scored by each team as independent Poisson variables
-* Uses expected goals (λ values) to derive scoreline probabilities
-* Converts score probabilities into match outcome probabilities
-
-### 📊 Advanced Feature Engineering
-
-* Rolling statistics (last 5 and 10 matches):
-
-  * Goals scored
-  * Shots
-  * Shots on target
-  * Clean sheets
-* Home/Away splits:
-
-  * Home team performance at home
-  * Away team performance away
-* Team strength via ELO rating system
-
-### 🔁 Automated Data Pipeline
-
-* Updates dataset with latest match results
-* Recomputes features dynamically
-* Ensures predictions reflect current form
-
-### 🎨 Frontend Visualization
-
-* Clean UI displaying:
-
-  * Match prediction (win/draw/loss)
-  * Probability bars
-  * Expected goals (xG)
-* Designed for interpretability and usability
-
+ 
+## Demo
+ 
+![PremPredict Demo](assets/demo.png)
+ 
 ---
-
-## 🧠 Modeling Approach
-
-### 1. Feature Engineering
-
-Key features include:
-
-* Rolling averages (form)
-* ELO ratings (team strength)
-* Home/away performance splits
-
-### 2. Expected Goals Estimation
-
-* Model estimates λ (expected goals) for both teams
-
-### 3. Poisson Distribution
-
-* Goals are modeled as:
-  P(X = k) = (λ^k * e^-λ) / k!
-
-### 4. Outcome Probabilities
-
-* Combine goal probabilities to compute:
-
-  * P(Home Win)
-  * P(Draw)
-  * P(Away Win)
-
+ 
+## How It Works
+ 
+1. **Data** — Historical EPL match data (2010–2025) sourced from [football-data.co.uk](https://www.football-data.co.uk)
+2. **Features** — Rolling form statistics (last 5 games), venue-split home/away stats, Elo ratings, shots on target, clean sheets, cumulative goal averages
+3. **Model** — Two separate Poisson Regressors trained on home and away goals. Outputs λ_home and λ_away (expected goals), which are fed into a probability matrix to compute P(Home Win), P(Draw), P(Away Win)
+4. **API** — FastAPI endpoint accepts home team, away team, and date — computes features on the fly and returns predictions
+5. **Frontend** — Single page HTML/CSS/JS interface
 ---
-
-## 📈 Example Output
-
-* Chelsea vs Manchester United:
-
-  * Chelsea Win: 39.6%
-  * Draw: 25.4%
-  * Man United Win: 35.0%
-
-* Arsenal vs Fulham:
-
-  * Arsenal Win: 66.6%
-  * Draw: 19.5%
-  * Fulham Win: 13.9%
-
-
+ 
+## Model Performance
+ 
+Evaluated using TimeSeriesSplit (5 folds) to prevent data leakage:
+ 
+| Metric | Value |
+|---|---|
+| Overall Accuracy | 54.5% |
+| H/A Only Accuracy (draws excluded) | 72.8% |
+| Baseline (always predict Home Win) | 45.2% |
+| Avg MAE — Home Goals | 0.979 |
+| Avg MAE — Away Goals | 0.879 |
+| Balanced Accuracy | 0.456 |
+ 
+Draw prediction is a known limitation of standard Poisson models — home advantage causes P(H) to dominate the argmax. The H/A accuracy of 72.8% reflects the model's genuine ability to identify the winning team when a draw is not the outcome.
+ 
 ---
-
-## 🛠 Tech Stack
-
-* Python
-* Pandas / NumPy
-* Machine Learning / Statistical Modeling
-* Frontend (custom UI)
-
+ 
+## Project Structure
+ 
+```
+prem_model/
+├── processing/               # Data pipeline scripts
+│   ├── download_data.py      # Fetches historical EPL data from football-data.co.uk
+│   ├── compute_elo.py        # Calculates Elo ratings for all teams
+│   ├── pre_rolling.py        # Builds team-level match rows with venue split
+│   ├── rolling_features.py   # Computes rolling window statistics
+│   └── build_match_dataset.py # Assembles final feature dataset
+├── processing_API/           # Update pipeline scripts
+│   ├── update_data.py        # Fetches new matches since last update
+│   └── update_elo.py         # Recomputes Elo and saves current ratings
+├── src/                      # Model training and API
+│   ├── poisson_prediction.py # Model training, evaluation, and saving
+│   └── api.py                # FastAPI prediction endpoint
+├── models/                   # Saved model files (generated, not tracked)
+├── data/                     # Data files (generated, not tracked)
+├── index.html                # Web frontend
+├── update_pipeline.py        # Orchestrates full data + model update
+└── requirements.txt
+```
+ 
 ---
-
-## 📌 Future Improvements
-
-* Model calibration (Brier score / reliability curves)
-* Dixon-Coles adjustment for low-scoring games
-* Incorporation of player-level data
-* Comparison with bookmaker odds
-
+ 
+## Setup
+ 
+### Prerequisites
+- Python 3.9+
+- Git
+### Installation
+ 
+```bash
+git clone https://github.com/Paulo-Pereira346/premier-league-prediction-model
+cd premier-league-prediction-model
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+ 
+### Build the dataset from scratch
+ 
+```bash
+python -m processing.download_data
+python -m processing.compute_elo
+python -m processing.pre_rolling
+python -m processing.rolling_features
+python -m processing.build_match_dataset
+```
+ 
+### Train and save the model
+ 
+```bash
+python -m src.poisson_prediction
+```
+ 
+### Run the API
+ 
+```bash
+uvicorn src.api:app --reload
+```
+ 
+API will be available at `http://localhost:8000`
+ 
+### Open the frontend
+ 
+Open `index.html` in your browser while the API is running.
+ 
 ---
-
-## 🎯 Key Takeaways
-
-This project demonstrates:
-
-* End-to-end data science workflow
-* Probabilistic modeling using domain knowledge
-* Importance of feature engineering in predictive systems
-* Integration of backend modeling with frontend visualization
-
+ 
+## API Endpoints
+ 
+### `GET /predict`
+ 
+Returns match outcome prediction for a given fixture.
+ 
+**Parameters:**
+| Param | Type | Example |
+|---|---|---|
+| home | string | Arsenal |
+| away | string | Chelsea |
+| date | string (YYYY-MM-DD) | 2026-04-19 |
+ 
+**Example request:**
+```
+GET /predict?home=Arsenal&away=Chelsea&date=2026-04-19
+```
+ 
+**Example response:**
+```json
+{
+  "lambda_home": 2.07,
+  "lambda_away": 1.21,
+  "prediction": "H",
+  "probabilities": {
+    "home_win": 0.551,
+    "draw": 0.228,
+    "away_win": 0.221
+  }
+}
+```
+ 
+### `GET /teams`
+ 
+Returns the list of all valid team names.
+ 
 ---
-
-## 📎 Conclusion
-
-This is a fully functional football prediction system that combines statistical rigor with practical usability. It serves as a strong foundation for more advanced sports analytics or predictive modeling systems.
+ 
+## Updating with New Match Data
+ 
+After each gameweek, run the update pipeline to fetch new results and retrain:
+ 
+```bash
+python update_pipeline.py
+```
+ 
+This automatically fetches new matches, recomputes Elo ratings, rebuilds rolling features, and retrains the model.
+ 
+---
+ 
+## Tech Stack
+ 
+- **Python** — pandas, numpy, scikit-learn, scipy
+- **Model** — Poisson Regression (scikit-learn) with probability matrix outcome prediction
+- **API** — FastAPI + uvicorn
+- **Frontend** — HTML, CSS, JavaScript (no frameworks)
+- **Data** — football-data.co.uk
+---
+ 
+## Key Design Decisions
+ 
+**Why Poisson Regression?** Goals in football follow a Poisson distribution naturally. Training separate models for home and away goals allows the probability of all three outcomes to be derived mathematically from the predicted lambdas.
+ 
+**Why venue-split features?** A team's home form and away form are fundamentally different. Arsenal scoring 2.1 goals per home game vs 1.3 per away game is more informative than a blended 1.7 average.
+ 
+**Why TimeSeriesSplit?** Standard cross-validation shuffles data randomly, causing data leakage for time-series data. TimeSeriesSplit ensures training data is always chronologically earlier than test data.
+ 
+---
+ 
+## Limitations
+ 
+- Draw prediction is weak — standard Poisson models systematically underpredict draws due to home advantage dominating the probability argmax
+- Predictions reflect form up to the last pipeline run — run `update_pipeline.py` after each gameweek for current predictions
+- No player-level data — injuries, suspensions, and squad rotations are not accounted for
+---
+ 
+## Author
+ 
+Paulo Pereira — Third year Computer Science Engineering student at Padre Conceição College of Engineering, Goa.
 
