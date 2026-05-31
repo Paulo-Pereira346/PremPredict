@@ -6,12 +6,6 @@ def rolling_features():
     root = file_path.parents[1]
     df = pd.read_csv(root / "data" / "processed" / "epl_pre_rolling.csv")
 
-    # print(df.head())
-    # print(df["team"].is_monotonic_increasing)
-    # df_temp = df[df["team"] == "Arsenal"]
-    # print(df_temp["date"].is_monotonic_increasing)
-
-
     #Rolling Features over 5,10 windows
     windows = [5,10]
     rolling_attributes = ["gd","sot","cs"]
@@ -31,7 +25,7 @@ def rolling_features():
                 df[mask].groupby("team")[att]
                 .transform(lambda x: x.shift(1).rolling(window=5, min_periods=1).mean())
             )
-    # print(df.head(11))
+
     arsenal_home = df[(df["team"] == "Arsenal") & (df["venue"] == "home")]
     print(arsenal_home[["date", "gf", "gf_last_5_home", "gf_last_5_away"]].head(10))
 
@@ -39,10 +33,7 @@ def rolling_features():
     for att in cumulative_attributes:
         col = f"cum_{att}"
         df[col] = df.groupby("team")[att].transform(lambda x: x.shift(1).expanding().mean())
-
-
-    #Preliminary Checks before Saving data
-    # print(df[df["team"]=="Arsenal"][["date","gf","gf_last_5","gf_last_10","cum_gf"]].head(11))
+        
     print(df.head())
     print(df.shape)
     print(df.columns)

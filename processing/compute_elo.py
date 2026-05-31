@@ -1,11 +1,11 @@
 import pandas as pd 
+from pathlib import Path
 
 def compute_elo():
-    df = pd.read_csv("../data/raw/epl_matches.csv")
-
-    # print(df.head(10))
-    # print(df.tail(10))
-    # print(df["date"].is_monotonic_increasing)
+    file_path = Path(__file__).resolve()
+    root = file_path.parents[1]
+    
+    df = pd.read_csv(root / "data" / "raw" / "epl_matches.csv")
     
     ratings = {}
     home_elo_list = []
@@ -44,12 +44,9 @@ def compute_elo():
     df["away_elo"] = away_elo_list   
     df["elo_diff"] = df["home_elo"] - df["away_elo"]
     
-    # print(df.head(25))
     
-    df.to_csv("../data/processed/epl_with_elo.csv" ,index = False)
+    df.to_csv(root / "data" / "processed" / "epl_with_elo.csv", index=False)
     
-    # print( df["home_elo"].describe())
-    # print(ratings.keys())
         
 
 compute_elo()

@@ -113,13 +113,6 @@ if __name__ == "__main__":
         MAE_home_list_Pois.append(mean_absolute_error(Y_home_test, Y_home_pred))
         MAE_away_list_Pois.append(mean_absolute_error(Y_away_test, Y_away_pred))
 
-        # Outcome prediction
-        # Y_res_list = []
-        # scoreline_list = []
-        # for i in range(len(Y_home_pred)):
-        #     outcome, home_goals, away_goals = predict_outcome(Y_home_pred[i], Y_away_pred[i])
-        #     Y_res_list.append(outcome)
-        #     scoreline_list.append((home_goals, away_goals))
         
         Y_res_list = []
         scoreline_list = []
